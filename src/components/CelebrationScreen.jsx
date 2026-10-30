@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Bunny from '../assets/bunny';
 import confetti from 'canvas-confetti';
-import { Heart, Sparkles, RefreshCw, Camera, PartyPopper } from 'lucide-react';
+import { Heart, Sparkles, RefreshCw, PartyPopper } from 'lucide-react';
 import { sound } from '../assets/sound';
 
 export default function CelebrationScreen({ photos, onReplay, onOpenPhotoManager }) {
@@ -53,6 +53,7 @@ export default function CelebrationScreen({ photos, onReplay, onOpenPhotoManager
   };
 
   const currentPhoto = activePhotos[photoIndex] || activePhotos[0];
+  const isTallStrip = currentPhoto?.isStrip || currentPhoto?.url?.includes('photo1');
 
   return (
     <div className="relative z-10 max-w-xl mx-auto px-4 py-8 flex flex-col items-center text-center">
@@ -107,7 +108,7 @@ export default function CelebrationScreen({ photos, onReplay, onOpenPhotoManager
         {/* Tape sticker on top */}
         <div className="absolute -top-3 left-1/2 -translate-x-1/2 w-20 h-5 bg-pink-200/90 rounded-sm rotate-[-2deg] border-t border-b border-pink-300 shadow-sm" />
 
-        <div className="relative aspect-[4/4] rounded-2xl overflow-hidden bg-gradient-to-br from-pink-50 to-rose-50 border border-pink-100 flex items-center justify-center shadow-inner">
+        <div className="relative aspect-[3/3.8] rounded-2xl overflow-hidden bg-gradient-to-br from-pink-50 to-rose-50 border border-pink-100 flex items-center justify-center shadow-inner">
           <AnimatePresence mode="wait">
             <motion.div
               key={currentPhoto?.id || photoIndex}
@@ -117,21 +118,14 @@ export default function CelebrationScreen({ photos, onReplay, onOpenPhotoManager
               transition={{ duration: 0.6 }}
               className="w-full h-full"
             >
-              {currentPhoto?.url ? (
+              {currentPhoto?.url && (
                 <img
                   src={currentPhoto.url}
                   alt={currentPhoto.caption}
-                  className="w-full h-full object-cover"
+                  className={`w-full h-full ${
+                    isTallStrip ? 'object-contain p-1.5 bg-pink-50/50' : 'object-cover object-top'
+                  }`}
                 />
-              ) : (
-                <div
-                  onClick={onOpenPhotoManager}
-                  className="w-full h-full flex flex-col items-center justify-center p-6 text-center cursor-pointer text-pink-500 hover:bg-pink-100/40 transition-colors"
-                >
-                  <Camera className="w-10 h-10 mb-2 opacity-80" />
-                  <span className="font-bold text-sm">Add Our Memories Together</span>
-                  <span className="text-xs text-pink-400 mt-1">Tap to upload real photos ❤️</span>
-                </div>
               )}
             </motion.div>
           </AnimatePresence>

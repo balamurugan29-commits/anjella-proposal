@@ -4,8 +4,8 @@
  * Safely persists full-resolution user uploaded photos across sessions & reloads.
  */
 
-const DB_NAME = 'anjella_proposal_db';
-const DB_VERSION = 1;
+const DB_NAME = 'anjella_proposal_db_v2';
+const DB_VERSION = 2;
 const STORE_NAME = 'photos';
 
 // Open or create IndexedDB
@@ -24,41 +24,45 @@ const openDB = () => {
     };
     request.onsuccess = (e) => resolve(e.target.result);
     request.onerror = (e) => {
-      console.warn('IndexedDB failed to open, falling back to localStorage', e);
+      console.warn('IndexedDB failed to open, falling back to default photos', e);
       resolve(null);
     };
   });
 };
 
-// Default starter photos / placeholders
+// 4 Real Photos of Balamurugan & Anjella in exact requested order
 export const DEFAULT_PHOTOS = [
   {
     id: 'photo-1',
-    url: '',
+    url: './photos/photo1.jpg',
     caption: 'My favourite memories ❤️',
-    date: 'Forever & Always',
+    date: 'Photo Booth Fun ✨',
     rotation: -2,
+    isStrip: true,
   },
   {
     id: 'photo-2',
-    url: '',
+    url: './photos/photo2.jpg',
     caption: 'You and me 🫂',
-    date: 'Every Sweet Moment',
-    rotation: 2.5,
+    date: 'Sweet Smiles 🌸',
+    rotation: 2,
+    isStrip: false,
   },
   {
     id: 'photo-3',
-    url: '',
+    url: './photos/photo3.jpg',
     caption: 'My favourite person 💖',
-    date: 'My Whole World',
+    date: 'My Queen in Maroon 👑',
     rotation: -1.5,
+    isStrip: false,
   },
   {
     id: 'photo-4',
-    url: '',
+    url: './photos/photo4.jpg',
     caption: 'With you, everything is sweeter 🌸',
-    date: 'Endless Smiles',
+    date: 'Forever & Always ✨',
     rotation: 1.8,
+    isStrip: false,
   }
 ];
 
@@ -72,25 +76,26 @@ export async function getStoredPhotos() {
         const req = store.get('gallery');
         req.onsuccess = () => {
           if (req.result && req.result.photos && req.result.photos.length > 0) {
-            resolve(req.result.photos);
-          } else {
-            // Check localStorage
-            const local = localStorage.getItem('anjella_photos');
-            if (local) {
-              try {
-                resolve(JSON.parse(local));
-                return;
-              } catch (_) {}
+            // Check if stored photos have real URLs; if empty strings, use DEFAULT_PHOTOS
+            const hasValid = req.result.photos.some(p => p.url && p.url.trim().length > 0);
+            if (hasValid) {
+              resolve(req.result.photos);
+              return;
             }
-            resolve(DEFAULT_PHOTOS);
           }
+          resolve(DEFAULT_PHOTOS);
         };
         req.onerror = () => resolve(DEFAULT_PHOTOS);
       });
     } else {
-      const local = localStorage.getItem('anjella_photos');
+      const local = localStorage.getItem('anjella_photos_v2');
       if (local) {
-        return JSON.parse(local);
+        try {
+          const parsed = JSON.parse(local);
+          if (parsed && parsed.length > 0 && parsed.some(p => p.url)) {
+            return parsed;
+          }
+        } catch (_) {}
       }
       return DEFAULT_PHOTOS;
     }
@@ -102,25 +107,14 @@ export async function getStoredPhotos() {
 
 export async function saveStoredPhotos(photos) {
   try {
-    // Save to IndexedDB
     const db = await openDB();
     if (db) {
       const tx = db.transaction(STORE_NAME, 'readwrite');
       const store = tx.objectStore(STORE_NAME);
       store.put({ id: 'gallery', photos, updatedAt: Date.now() });
     }
-    // Also save lightweight metadata to localStorage
     try {
-      localStorage.setItem('anjella_photos_meta', JSON.stringify({ count: photos.length, updatedAt: Date.now() }));
-      // Save small preview if within quota
-      const lightweight = photos.map(p => ({
-        id: p.id,
-        caption: p.caption,
-        date: p.date,
-        rotation: p.rotation,
-        url: p.url.length < 500000 ? p.url : '' // don't overwhelm localStorage if huge
-      }));
-      localStorage.setItem('anjella_photos', JSON.stringify(lightweight));
+      localStorage.setItem('anjella_photos_v2', JSON.stringify(photos));
     } catch (_) {}
     return true;
   } catch (err) {
