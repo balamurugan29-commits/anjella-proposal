@@ -1,0 +1,61 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    background: radial-gradient(circle at 50% 20%, #FFF5F8 0%, #FFE9EF 50%, #F5E8FB 100%);
+    min-height: 100vh;
+    font-family: 'Quicksand', sans-serif;
+    color: #4A3E4E;
+    overflow-x: hidden;
+  }
+}
+
+/* Custom kawaii scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #FFF0F4;
+}
+::-webkit-scrollbar-thumb {
+  background: #FFB6C1;
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #FF8DA1;
+}
+
+/* Dashed pink and blue proposal card border as seen in reference video */
+.dashed-border-proposal {
+  border: 4px dashed #FF8DA1;
+  box-shadow: 0 0 0 4px #A0C4FF, 0 15px 35px -5px rgba(255, 141, 161, 0.35);
+  background-color: #FFFFFF;
+}
+
+/* Romantic Polaroid card styling */
+.polaroid-card {
+  background: #FFFFFF;
+  box-shadow: 0 12px 28px -4px rgba(255, 141, 161, 0.28), 0 4px 10px rgba(0, 0, 0, 0.05);
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.polaroid-card:hover {
+  transform: translateY(-6px) scale(1.02);
+  box-shadow: 0 20px 35px -4px rgba(255, 141, 161, 0.4), 0 8px 16px rgba(0, 0, 0, 0.08);
+}
+
+/* Kawaii button ripple and glow */
+.btn-glow-pink {
+  box-shadow: 0 8px 24px -2px rgba(255, 77, 121, 0.45);
+}
+
+.btn-glow-pink:hover {
+  box-shadow: 0 12px 30px 2px rgba(255, 77, 121, 0.6);
+}
+
+/* Heart-shaped QR code mask */
+.heart-clip {
+  clip-path: path("M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z");
+}
